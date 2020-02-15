@@ -1,0 +1,8 @@
+server:
+  address: 127.0.0.1:8080
+log:
+  level: info
+backend:
+  in-mem: {}
+#  json-file:
+#    path: "urls.json"
