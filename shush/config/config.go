@@ -8,29 +8,29 @@ import (
 	"reflect"
 )
 
-type LogConf struct {
+type Log struct {
 	Level string `yaml:"level,omitempty"`
 }
 
-type ServerConf struct {
+type Server struct {
 	Address string `yaml:"address,omitempty"`
 }
 
-type BackendInMemConf struct {
+type BackendInMem struct {
 }
 
-type BackendJsonFileConf struct {
+type BackendJsonFile struct {
 	Path string `yaml:"path"`
 }
 
 type BackendConf struct {
-	InMem    *BackendInMemConf    `yaml:"in-mem,omitempty"`
-	JsonFile *BackendJsonFileConf `yaml:"json-file,omitempty"`
+	InMem    *BackendInMem    `yaml:"in-mem,omitempty"`
+	JsonFile *BackendJsonFile `yaml:"json-file,omitempty"`
 }
 
 type Conf struct {
-	Log     LogConf     `yaml:"log,omitempty"`
-	Server  ServerConf  `yaml:"server,omitempty"`
+	Log     Log         `yaml:"log,omitempty"`
+	Server  Server      `yaml:"server,omitempty"`
 	Backend BackendConf `yaml:"backend,omitempty"`
 }
 
@@ -47,7 +47,7 @@ func NewConf(fn string) (*Conf, error) {
 	}
 	if conf.numBackends() == 0 {
 		log.Info("No backend configured using in-mem")
-		conf.Backend.InMem = &BackendInMemConf{}
+		conf.Backend.InMem = &BackendInMem{}
 	}
 	err = conf.validate()
 	if err != nil {

@@ -16,8 +16,8 @@ func TestConf(t *testing.T) {
 	if err == nil {
 		t.Error("0 backends allowed")
 	}
-	c.Backend.InMem = &BackendInMemConf{}
-	c.Backend.JsonFile = &BackendJsonFileConf{}
+	c.Backend.InMem = &BackendInMem{}
+	c.Backend.JsonFile = &BackendJsonFile{}
 	err = c.validate()
 	if err == nil {
 		t.Error(">1 backend allowed")
