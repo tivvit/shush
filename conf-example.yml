@@ -1,8 +1,10 @@
 server:
-  address: 127.0.0.1:8080
+  address: 0.0.0.0:8080
 log:
   level: info
 backend:
-  in-mem: {}
+#  in-mem: {}
 #  json-file:
 #    path: "urls.json"
+  redis:
+    address: redis:6379

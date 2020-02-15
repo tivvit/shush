@@ -23,9 +23,14 @@ type BackendJsonFile struct {
 	Path string `yaml:"path"`
 }
 
+type BackendRedis struct {
+	Address string `yaml:"address,omitempty"`
+}
+
 type BackendConf struct {
 	InMem    *BackendInMem    `yaml:"in-mem,omitempty"`
 	JsonFile *BackendJsonFile `yaml:"json-file,omitempty"`
+	Redis    *BackendRedis    `yaml:"redis,omitempty"`
 }
 
 type Conf struct {

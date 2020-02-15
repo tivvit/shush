@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"flag"
+	"github.com/go-redis/redis/v7"
 	log "github.com/sirupsen/logrus"
 	"github.com/tivvit/shush/shush/backend"
 	"github.com/tivvit/shush/shush/config"
@@ -39,7 +40,7 @@ func fastHTTPHandler(ctx *fasthttp.RequestCtx) {
 	}
 }
 
-func setupLogger(c config.LogConf) {
+func setupLogger(c config.Log) {
 	lvl, err := log.ParseLevel(c.Level)
 	if err != nil {
 		log.Error(err)
@@ -53,6 +54,11 @@ func initBackend(bc config.BackendConf) (backend.Backend, error) {
 	}
 	if bc.JsonFile != nil {
 		return backend.NewJsonFile(bc.JsonFile.Path), nil
+	}
+	if bc.Redis != nil {
+		return backend.NewRedis(&redis.Options{
+			Addr: bc.Redis.Address,
+		}), nil
 	}
 	return nil, errors.New("unknown backend")
 }
