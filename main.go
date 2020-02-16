@@ -6,11 +6,12 @@ import (
 	"github.com/go-redis/redis/v7"
 	log "github.com/sirupsen/logrus"
 	"github.com/tivvit/shush/shush/backend"
+	"github.com/tivvit/shush/shush/cache"
 	"github.com/tivvit/shush/shush/config"
 	"github.com/valyala/fasthttp"
 )
 
-var b backend.Backend
+var b cache.Cache
 
 func main() {
 	confFile := flag.String("confFile", "conf.yml", "Configuration file path")
