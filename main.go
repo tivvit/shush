@@ -21,9 +21,13 @@ func main() {
 		log.Fatal(err)
 	}
 	setupLogger(c.Log)
-	b, err = initBackend(c.Backend)
+	bck, err := initBackend(c.Backend)
 	if err != nil {
 		log.Fatal(err)
+	}
+	b, err = initCache(bck, c.Cache)
+	if err != nil {
+		log.Warn(err)
 	}
 	err = fasthttp.ListenAndServe(c.Server.Address, fastHTTPHandler)
 	if err != nil {
@@ -62,4 +66,14 @@ func initBackend(bc config.BackendConf) (backend.Backend, error) {
 		}), nil
 	}
 	return nil, errors.New("unknown backend")
+}
+
+func initCache(b backend.Backend, cc *config.CacheConf) (cache.Cache, error) {
+	if cc == nil {
+		return b, nil
+	}
+	if cc.BigCache != nil {
+		return cache.NewBigCache(b, cc.BigCache), nil
+	}
+	return b, errors.New("unknown cache")
 }

@@ -3,6 +3,7 @@ module github.com/tivvit/shush
 go 1.13
 
 require (
+	github.com/allegro/bigcache v1.2.1
 	github.com/go-redis/redis/v7 v7.1.0
 	github.com/go-yaml/yaml v2.1.0+incompatible // indirect
 	github.com/klauspost/compress v1.10.0 // indirect

@@ -8,3 +8,12 @@ backend:
 #    path: "urls.json"
   redis:
     address: redis:6379
+cache:
+  big-cache:
+    life-window-sec: 600
+    clean-window-sec: 10
+    max-entry-size-bytes: 256
+    verbose: true
+    hard-max-cache-size-mb: 1024
+  #  shards-pow: 10
+  #  max-entries-in-window: 600000

@@ -33,10 +33,25 @@ type BackendConf struct {
 	Redis    *BackendRedis    `yaml:"redis,omitempty"`
 }
 
+type BigCache struct {
+	LifeWindowSec int `yaml:"life-window-sec"`
+	ShardsPow *int `yaml:"shards-pow,omitempty"`
+	CleanWindowSec *int `yaml:"clean-window-sec,omitempty"`
+	MaxEntriesInWindow *int `yaml:"max-entries-in-window,omitempty"`
+	MaxEntrySizeBytes *int `yaml:"max-entry-size-bytes,omitempty"`
+	Verbose *bool `yaml:"verbose,omitempty"`
+	HardMaxCacheSizeMb *int `yaml:"hard-max-cache-size-mb,omitempty"`
+}
+
+type CacheConf struct {
+	BigCache *BigCache `yaml:"big-cache,omitempty"`
+}
+
 type Conf struct {
 	Log     Log         `yaml:"log,omitempty"`
 	Server  Server      `yaml:"server,omitempty"`
 	Backend BackendConf `yaml:"backend,omitempty"`
+	Cache   *CacheConf  `yaml:"cache,omitempty"`
 }
 
 func NewConf(fn string) (*Conf, error) {
