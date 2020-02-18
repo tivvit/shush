@@ -49,9 +49,15 @@ type FreeCache struct {
 	GcPercent   *int `yaml:"gc-percent,omitempty"`
 }
 
+type LruCache struct {
+	MaxElems  int `yaml:"max-elems"`
+	ExpireSec int `yaml:"expire-sec"`
+}
+
 type CacheConf struct {
 	BigCache  *BigCache  `yaml:"big-cache,omitempty"`
 	FreeCache *FreeCache `yaml:"free-cache,omitempty"`
+	LruCache  *LruCache  `yaml:"lru-cache,omitempty"`
 }
 
 type Conf struct {

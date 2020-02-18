@@ -17,7 +17,10 @@ cache:
 #    hard-max-cache-size-mb: 1024
 #  #  shards-pow: 10
 #  #  max-entries-in-window: 600000
-  free-cache:
+#  free-cache:
+#    expire-sec: 600
+#    size-kb: 104857600
+##    gc-percent: 20
+  lru-cache:
+    max-elems: 1000000
     expire-sec: 600
-    size-kb: 104857600
-#    gc-percent: 20

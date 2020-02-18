@@ -78,5 +78,8 @@ func initCache(b backend.Backend, cc *config.CacheConf) (cache.Cache, error) {
 	if cc.FreeCache != nil {
 		return cache.NewFreeCache(b, cc.FreeCache), nil
 	}
+	if cc.LruCache != nil {
+		return cache.NewLru(b, cc.LruCache), nil
+	}
 	return b, errors.New("unknown cache")
 }
