@@ -19,8 +19,10 @@ cache:
 #  #  max-entries-in-window: 600000
 #  free-cache:
 #    expire-sec: 600
-#    size-kb: 104857600
+#    size-kb: 1048576
 ##    gc-percent: 20
-  lru-cache:
-    max-elems: 1000000
-    expire-sec: 600
+#  lru-cache:
+#    max-elems: 1000000
+#    expire-sec: 600
+  fast-cache:
+    size-bytes: 1073741824

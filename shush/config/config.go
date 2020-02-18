@@ -54,10 +54,15 @@ type LruCache struct {
 	ExpireSec int `yaml:"expire-sec"`
 }
 
+type FastCache struct {
+	MaxBytes int `yaml:"size-bytes"`
+}
+
 type CacheConf struct {
 	BigCache  *BigCache  `yaml:"big-cache,omitempty"`
 	FreeCache *FreeCache `yaml:"free-cache,omitempty"`
 	LruCache  *LruCache  `yaml:"lru-cache,omitempty"`
+	FastCache *FastCache `yaml:"fast-cache,omitempty"`
 }
 
 type Conf struct {

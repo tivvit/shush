@@ -3,6 +3,7 @@ module github.com/tivvit/shush
 go 1.13
 
 require (
+	github.com/VictoriaMetrics/fastcache v1.5.7 // indirect
 	github.com/allegro/bigcache v1.2.1
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/coocood/freecache v1.1.0
