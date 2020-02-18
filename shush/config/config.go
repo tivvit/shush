@@ -58,11 +58,18 @@ type FastCache struct {
 	MaxBytes int `yaml:"size-bytes"`
 }
 
+type RistrettoCache struct {
+	Counters int64 `yaml:"counters"`
+	MaxCost  int64 `yaml:"max-cost"`
+	Metrics  *bool `yaml:"metrics,omitempty"`
+}
+
 type CacheConf struct {
-	BigCache  *BigCache  `yaml:"big-cache,omitempty"`
-	FreeCache *FreeCache `yaml:"free-cache,omitempty"`
-	LruCache  *LruCache  `yaml:"lru-cache,omitempty"`
-	FastCache *FastCache `yaml:"fast-cache,omitempty"`
+	BigCache       *BigCache       `yaml:"big-cache,omitempty"`
+	FreeCache      *FreeCache      `yaml:"free-cache,omitempty"`
+	LruCache       *LruCache       `yaml:"lru-cache,omitempty"`
+	FastCache      *FastCache      `yaml:"fast-cache,omitempty"`
+	RistrettoCache *RistrettoCache `yaml:"ristretto-cache,omitempty"`
 }
 
 type Conf struct {

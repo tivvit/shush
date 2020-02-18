@@ -22,7 +22,11 @@ cache:
 #    size-kb: 1048576
 ##    gc-percent: 20
 #  lru-cache:
-#    max-elems: 1000000
+#    max-elems: 10000000
 #    expire-sec: 600
-  fast-cache:
-    size-bytes: 1073741824
+#  fast-cache:
+#    size-bytes: 1073741824
+  ristretto-cache:
+    counters: 100000000 # 10 * elements
+    max-cost: 10000000 # elements
+#    metrics: true
