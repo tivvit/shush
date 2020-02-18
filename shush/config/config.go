@@ -34,17 +34,24 @@ type BackendConf struct {
 }
 
 type BigCache struct {
-	LifeWindowSec int `yaml:"life-window-sec"`
-	ShardsPow *int `yaml:"shards-pow,omitempty"`
-	CleanWindowSec *int `yaml:"clean-window-sec,omitempty"`
-	MaxEntriesInWindow *int `yaml:"max-entries-in-window,omitempty"`
-	MaxEntrySizeBytes *int `yaml:"max-entry-size-bytes,omitempty"`
-	Verbose *bool `yaml:"verbose,omitempty"`
-	HardMaxCacheSizeMb *int `yaml:"hard-max-cache-size-mb,omitempty"`
+	LifeWindowSec      int   `yaml:"life-window-sec"`
+	ShardsPow          *int  `yaml:"shards-pow,omitempty"`
+	CleanWindowSec     *int  `yaml:"clean-window-sec,omitempty"`
+	MaxEntriesInWindow *int  `yaml:"max-entries-in-window,omitempty"`
+	MaxEntrySizeBytes  *int  `yaml:"max-entry-size-bytes,omitempty"`
+	Verbose            *bool `yaml:"verbose,omitempty"`
+	HardMaxCacheSizeMb *int  `yaml:"hard-max-cache-size-mb,omitempty"`
+}
+
+type FreeCache struct {
+	CacheSizeKb int  `yaml:"size-kb"`
+	ExpireSec   int  `yaml:"expire-sec"`
+	GcPercent   *int `yaml:"gc-percent,omitempty"`
 }
 
 type CacheConf struct {
-	BigCache *BigCache `yaml:"big-cache,omitempty"`
+	BigCache  *BigCache  `yaml:"big-cache,omitempty"`
+	FreeCache *FreeCache `yaml:"free-cache,omitempty"`
 }
 
 type Conf struct {
@@ -93,6 +100,21 @@ func (c *Conf) numBackends() int {
 	return backendCnt
 }
 
+func (c *Conf) numCaches() int {
+	cacheCnt := 0
+	if c.Cache == nil {
+		return cacheCnt
+	}
+	val := reflect.ValueOf(*c.Cache)
+	for i := 0; i < val.Type().NumField(); i++ {
+		log.Debug(val.Type().Field(i).Name, val.Field(i).Interface(), val.Field(i).Type())
+		if !val.Field(i).IsNil() {
+			cacheCnt++
+		}
+	}
+	return cacheCnt
+}
+
 func (c *Conf) validate() error {
 	backendCnt := c.numBackends()
 	if backendCnt == 0 {
@@ -100,6 +122,9 @@ func (c *Conf) validate() error {
 	}
 	if backendCnt > 1 {
 		return errors.New("more than one backend configured")
+	}
+	if c.numCaches() > 1 {
+		return errors.New("more then one cache configured")
 	}
 	return nil
 }

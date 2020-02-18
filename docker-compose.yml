@@ -6,5 +6,6 @@ services:
       - 80:8080
     volumes:
       - "./conf-example.yml:/app/conf.yml"
+      - "./data.json:/app/urls.json"
   redis:
     image: redis
