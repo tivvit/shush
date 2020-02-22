@@ -27,10 +27,15 @@ type BackendRedis struct {
 	Address string `yaml:"address,omitempty"`
 }
 
+type BackendBadger struct {
+	Path string `yaml:"path"`
+}
+
 type BackendConf struct {
 	InMem    *BackendInMem    `yaml:"in-mem,omitempty"`
 	JsonFile *BackendJsonFile `yaml:"json-file,omitempty"`
 	Redis    *BackendRedis    `yaml:"redis,omitempty"`
+	Badger   *BackendBadger   `yaml:"badger,omitempty"`
 }
 
 type BigCache struct {

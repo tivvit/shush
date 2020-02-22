@@ -40,9 +40,6 @@ func (r Redis) GetAll() (map[string]string, error) {
 	return m, nil
 }
 
-func (r Redis) Set(key string, value string, ttl int) {
-	err := r.client.Set(key, value, time.Duration(ttl)).Err()
-	if err != nil {
-		panic(err)
-	}
+func (r Redis) Set(key string, value string, ttl int) error {
+	return r.client.Set(key, value, time.Duration(ttl)).Err()
 }

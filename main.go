@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"flag"
+	"github.com/dgraph-io/badger"
 	"github.com/go-redis/redis/v7"
 	log "github.com/sirupsen/logrus"
 	"github.com/tivvit/shush/shush/backend"
@@ -64,6 +65,14 @@ func initBackend(bc config.BackendConf) (backend.Backend, error) {
 		return backend.NewRedis(&redis.Options{
 			Addr: bc.Redis.Address,
 		}), nil
+	}
+	if bc.Redis != nil {
+		return backend.NewRedis(&redis.Options{
+			Addr: bc.Redis.Address,
+		}), nil
+	}
+	if bc.Badger != nil {
+		return backend.NewBadger(badger.DefaultOptions(bc.Badger.Path)), nil
 	}
 	return nil, errors.New("unknown backend")
 }
