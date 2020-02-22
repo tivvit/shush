@@ -2,7 +2,7 @@ package cache
 
 import (
 	"github.com/tivvit/shush/shush/backend"
-	"github.com/tivvit/shush/shush/config"
+	"github.com/tivvit/shush/shush/config/cache"
 	"time"
 
 	"github.com/allegro/bigcache"
@@ -14,7 +14,7 @@ type BigCache struct {
 	cache   *bigcache.BigCache
 }
 
-func NewBigCache(b backend.Backend, config *config.BigCache) *BigCache {
+func NewBigCache(b backend.Backend, config *cache.Big) *BigCache {
 	bc := &BigCache{
 		backend: b,
 	}

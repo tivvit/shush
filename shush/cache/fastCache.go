@@ -3,7 +3,7 @@ package cache
 import (
 	"github.com/VictoriaMetrics/fastcache"
 	"github.com/tivvit/shush/shush/backend"
-	"github.com/tivvit/shush/shush/config"
+	"github.com/tivvit/shush/shush/config/cache"
 )
 
 type FastCache struct {
@@ -11,7 +11,7 @@ type FastCache struct {
 	cache   *fastcache.Cache
 }
 
-func NewFastCache(backend backend.Backend, conf *config.FastCache) *FastCache {
+func NewFastCache(backend backend.Backend, conf *cache.Fast) *FastCache {
 	return &FastCache{
 		backend: backend,
 		cache:   fastcache.New(conf.MaxBytes),

@@ -4,7 +4,7 @@ import (
 	"github.com/evamayerova/lrucache"
 	log "github.com/sirupsen/logrus"
 	"github.com/tivvit/shush/shush/backend"
-	"github.com/tivvit/shush/shush/config"
+	"github.com/tivvit/shush/shush/config/cache"
 )
 
 type Lru struct {
@@ -13,7 +13,7 @@ type Lru struct {
 	ttlSec  int
 }
 
-func NewLru(b backend.Backend, conf *config.LruCache) *Lru {
+func NewLru(b backend.Backend, conf *cache.Lru) *Lru {
 	return &Lru{
 		backend: b,
 		cache: lrucache.NewCache(conf.MaxElems),

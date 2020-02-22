@@ -4,7 +4,7 @@ import (
 	"github.com/dgraph-io/ristretto"
 	log "github.com/sirupsen/logrus"
 	"github.com/tivvit/shush/shush/backend"
-	"github.com/tivvit/shush/shush/config"
+	"github.com/tivvit/shush/shush/config/cache"
 )
 
 type Ristretto struct {
@@ -12,7 +12,7 @@ type Ristretto struct {
 	cache   *ristretto.Cache
 }
 
-func NewRistrettoCache(b backend.Backend, conf *config.RistrettoCache) *Ristretto {
+func NewRistrettoCache(b backend.Backend, conf *cache.Ristretto) *Ristretto {
 	r := &Ristretto{
 		backend: b,
 	}

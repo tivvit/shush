@@ -3,6 +3,8 @@ package config
 import (
 	"errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/tivvit/shush/shush/config/backend"
+	"github.com/tivvit/shush/shush/config/cache"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"reflect"
@@ -16,72 +18,11 @@ type Server struct {
 	Address string `yaml:"address,omitempty"`
 }
 
-type BackendInMem struct {
-}
-
-type BackendJsonFile struct {
-	Path string `yaml:"path"`
-}
-
-type BackendRedis struct {
-	Address string `yaml:"address,omitempty"`
-}
-
-type BackendBadger struct {
-	Path string `yaml:"path"`
-}
-
-type BackendConf struct {
-	InMem    *BackendInMem    `yaml:"in-mem,omitempty"`
-	JsonFile *BackendJsonFile `yaml:"json-file,omitempty"`
-	Redis    *BackendRedis    `yaml:"redis,omitempty"`
-	Badger   *BackendBadger   `yaml:"badger,omitempty"`
-}
-
-type BigCache struct {
-	LifeWindowSec      int   `yaml:"life-window-sec"`
-	ShardsPow          *int  `yaml:"shards-pow,omitempty"`
-	CleanWindowSec     *int  `yaml:"clean-window-sec,omitempty"`
-	MaxEntriesInWindow *int  `yaml:"max-entries-in-window,omitempty"`
-	MaxEntrySizeBytes  *int  `yaml:"max-entry-size-bytes,omitempty"`
-	Verbose            *bool `yaml:"verbose,omitempty"`
-	HardMaxCacheSizeMb *int  `yaml:"hard-max-cache-size-mb,omitempty"`
-}
-
-type FreeCache struct {
-	CacheSizeKb int  `yaml:"size-kb"`
-	ExpireSec   int  `yaml:"expire-sec"`
-	GcPercent   *int `yaml:"gc-percent,omitempty"`
-}
-
-type LruCache struct {
-	MaxElems  int `yaml:"max-elems"`
-	ExpireSec int `yaml:"expire-sec"`
-}
-
-type FastCache struct {
-	MaxBytes int `yaml:"size-bytes"`
-}
-
-type RistrettoCache struct {
-	Counters int64 `yaml:"counters"`
-	MaxCost  int64 `yaml:"max-cost"`
-	Metrics  *bool `yaml:"metrics,omitempty"`
-}
-
-type CacheConf struct {
-	BigCache       *BigCache       `yaml:"big-cache,omitempty"`
-	FreeCache      *FreeCache      `yaml:"free-cache,omitempty"`
-	LruCache       *LruCache       `yaml:"lru-cache,omitempty"`
-	FastCache      *FastCache      `yaml:"fast-cache,omitempty"`
-	RistrettoCache *RistrettoCache `yaml:"ristretto-cache,omitempty"`
-}
-
 type Conf struct {
-	Log     Log         `yaml:"log,omitempty"`
-	Server  Server      `yaml:"server,omitempty"`
-	Backend BackendConf `yaml:"backend,omitempty"`
-	Cache   *CacheConf  `yaml:"cache,omitempty"`
+	Log     Log          `yaml:"log,omitempty"`
+	Server  Server       `yaml:"server,omitempty"`
+	Backend backend.Conf `yaml:"backend,omitempty"`
+	Cache   *cache.Conf  `yaml:"cache,omitempty"`
 }
 
 func NewConf(fn string) (*Conf, error) {
@@ -97,7 +38,7 @@ func NewConf(fn string) (*Conf, error) {
 	}
 	if conf.numBackends() == 0 {
 		log.Info("No backend configured using in-mem")
-		conf.Backend.InMem = &BackendInMem{}
+		conf.Backend.InMem = &backend.InMem{}
 	}
 	err = conf.validate()
 	if err != nil {
