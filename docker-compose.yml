@@ -9,3 +9,24 @@ services:
       - "./data.json:/app/urls.json"
   redis:
     image: redis
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    ports:
+    - 8080:8080
+    environment:
+    - SWAGGER_JSON=/data/swagger.yaml
+    volumes:
+    - "./swagger.yaml:/data/swagger.yaml"
+  swagger-editor:
+    image: swaggerapi/swagger-editor
+    ports:
+    - 8080:8080
+  swagger-gen:
+    image: swaggerapi/swagger-codegen-cli-v3
+    command: >
+      generate
+      -i /local/swagger.yaml
+      -l go-server
+      -o /local/out/go
+    volumes:
+    - "./:/local"
