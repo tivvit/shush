@@ -4,7 +4,7 @@ import (
 	"github.com/coocood/freecache"
 	log "github.com/sirupsen/logrus"
 	"github.com/tivvit/shush/shush/backend"
-	"github.com/tivvit/shush/shush/config"
+	"github.com/tivvit/shush/shush/config/cache"
 	"runtime/debug"
 )
 
@@ -14,7 +14,7 @@ type FreeCache struct {
 	expirationSec int
 }
 
-func NewFreeCache(backend backend.Backend, conf *config.FreeCache) *FreeCache {
+func NewFreeCache(backend backend.Backend, conf *cache.Free) *FreeCache {
 	fc := &FreeCache{
 		backend:       backend,
 		expirationSec: conf.ExpireSec,

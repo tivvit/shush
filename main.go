@@ -3,11 +3,14 @@ package main
 import (
 	"errors"
 	"flag"
+	"github.com/dgraph-io/badger"
 	"github.com/go-redis/redis/v7"
 	log "github.com/sirupsen/logrus"
 	"github.com/tivvit/shush/shush/backend"
 	"github.com/tivvit/shush/shush/cache"
 	"github.com/tivvit/shush/shush/config"
+	backendConf "github.com/tivvit/shush/shush/config/backend"
+	cacheConf "github.com/tivvit/shush/shush/config/cache"
 	"github.com/valyala/fasthttp"
 )
 
@@ -53,7 +56,7 @@ func setupLogger(c config.Log) {
 	log.SetLevel(lvl)
 }
 
-func initBackend(bc config.BackendConf) (backend.Backend, error) {
+func initBackend(bc backendConf.Conf) (backend.Backend, error) {
 	if bc.InMem != nil {
 		return backend.NewInMem(), nil
 	}
@@ -65,10 +68,18 @@ func initBackend(bc config.BackendConf) (backend.Backend, error) {
 			Addr: bc.Redis.Address,
 		}), nil
 	}
+	if bc.Redis != nil {
+		return backend.NewRedis(&redis.Options{
+			Addr: bc.Redis.Address,
+		}), nil
+	}
+	if bc.Badger != nil {
+		return backend.NewBadger(badger.DefaultOptions(bc.Badger.Path)), nil
+	}
 	return nil, errors.New("unknown backend")
 }
 
-func initCache(b backend.Backend, cc *config.CacheConf) (cache.Cache, error) {
+func initCache(b backend.Backend, cc *cacheConf.Conf) (cache.Cache, error) {
 	if cc == nil {
 		return b, nil
 	}
