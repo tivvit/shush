@@ -1,0 +1,104 @@
+openapi: 3.0.0
+info:
+  title: Shush API
+  version: 1.0.0
+externalDocs:
+  url: https://github.com/tivvit/shush
+servers:
+  - url: https://s/api/v1
+paths:
+  /urls:
+    get: # todo pagination, limit by user, limit by regex
+      summary: List all urls
+      responses:
+        '200':
+          description: A JSON array of url details
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Url'
+    post:
+      summary: Add url
+      responses:
+        '201':
+          description: Created url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Url'
+  /urls/{short_url}:
+    get:
+      summary: url details
+      parameters:
+        - name: short_url
+          in: path
+          required: true
+          description: shorturl
+          schema:
+            type : string
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Url'
+        '404':
+          description: not found
+    put:
+      summary: create/update url
+      parameters:
+        - name: short_url
+          in: path
+          required: true
+          description: shorturl
+          schema:
+            type : string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Url'
+      responses:
+        '200':
+          description: updated/created url
+    delete:
+      summary: delete url
+      parameters:
+        - name: short_url
+          in: path
+          required: true
+          description: shorturl
+          schema:
+            type : string
+      responses:
+        '204':
+          description: url deleted
+components:
+  schemas:
+    Url:
+      properties:
+        short_url:
+          type: string
+        target:
+          type: string
+        owners:
+          type: array
+          items:
+            type: string
+        expiration:
+          type: string
+          format: date-time
+      required:
+        - short_url
+        - target
+        - owners
+      example: {
+        "short_url": "g",
+        "target": "https://gogle.com",
+        "owners": ["tivvit"],
+        "expiration": "2017-07-21T17:32:28Z"
+      }

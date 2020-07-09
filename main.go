@@ -6,12 +6,15 @@ import (
 	"github.com/dgraph-io/badger"
 	"github.com/go-redis/redis/v7"
 	log "github.com/sirupsen/logrus"
+	"github.com/tivvit/shush/shush-api"
 	"github.com/tivvit/shush/shush/backend"
 	"github.com/tivvit/shush/shush/cache"
 	"github.com/tivvit/shush/shush/config"
 	backendConf "github.com/tivvit/shush/shush/config/backend"
 	cacheConf "github.com/tivvit/shush/shush/config/cache"
 	"github.com/valyala/fasthttp"
+	"net/http"
+	"sync"
 )
 
 var b cache.Cache
@@ -32,10 +35,23 @@ func main() {
 	if err != nil {
 		log.Warn(err)
 	}
-	err = fasthttp.ListenAndServe(c.Server.Address, fastHTTPHandler)
-	if err != nil {
-		log.Error(err)
-	}
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		log.Infof("starting server at %s", c.Server.Address)
+		err = fasthttp.ListenAndServe(c.Server.Address, fastHTTPHandler)
+		if err != nil {
+			log.Error(err)
+		}
+		wg.Done()
+	}()
+	wg.Add(1)
+	go func() {
+		log.Printf("API Server starting at %s", c.Api.Address)
+		log.Fatal(http.ListenAndServe(c.Api.Address, shush_api.NewRouter()))
+		wg.Done()
+	}()
+	wg.Wait()
 }
 
 func fastHTTPHandler(ctx *fasthttp.RequestCtx) {

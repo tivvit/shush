@@ -21,6 +21,7 @@ type Server struct {
 type Conf struct {
 	Log     Log          `yaml:"log,omitempty"`
 	Server  Server       `yaml:"server,omitempty"`
+	Api     Server       `yaml:"api,omitempty"`
 	Backend backend.Conf `yaml:"backend,omitempty"`
 	Cache   *cache.Conf  `yaml:"cache,omitempty"`
 }

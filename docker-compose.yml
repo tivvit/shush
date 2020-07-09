@@ -6,6 +6,19 @@ services:
       - 80:8080
     volumes:
       - "./conf-example.yml:/app/conf.yml"
-      - "./data.json:/app/urls.json"
+      - "./urls.json:/app/urls.json"
   redis:
     image: redis
+  swagger-help:
+    image: swaggerapi/swagger-codegen-cli-v3
+    command: config-help -l go-server
+  swagger-gen:
+    image: swaggerapi/swagger-codegen-cli-v3
+    command: >
+      generate
+      -i /local/swagger.yml
+      -l go-server
+      -o /local/
+      -D packageName=shush_api
+    volumes:
+    - "./:/local"
