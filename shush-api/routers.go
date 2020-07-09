@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/tivvit/shush/shush/backend"
 )
 
 type Route struct {
@@ -24,12 +25,13 @@ type Route struct {
 
 type Routes []Route
 
+
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
 	for _, route := range routes {
 		var handler http.Handler
 		handler = route.HandlerFunc
-		handler = Logger(handler, route.Name)
+		//handler = Logger(handler, route.Name)
 
 		router.
 			Methods(route.Method).
@@ -39,6 +41,12 @@ func NewRouter() *mux.Router {
 	}
 
 	return router
+}
+
+var bck backend.Backend
+
+func SetBackend(b backend.Backend) {
+	bck = b
 }
 
 var routes = Routes{

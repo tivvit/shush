@@ -9,6 +9,10 @@
 package shush_api
 
 import (
+	"encoding/json"
+	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -29,10 +33,40 @@ func UrlsShortUrlDelete(w http.ResponseWriter, r *http.Request) {
 
 func UrlsShortUrlGet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	p := mux.Vars(r)
+	sUrl := p["short_url"]
+	v, err := bck.Get(sUrl)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		//w.Write() // todo
+		return
+	}
 	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte(v))
+	if err != nil {
+		log.Warnf("response write failed %s", err.Error())
+	}
 }
 
 func UrlsShortUrlPut(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	p := mux.Vars(r)
+	sUrl := p["short_url"]
+	url := Url{}
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Warn("malformed body")
+		// todo inform user
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = json.Unmarshal(b, &url)
+	if err != nil {
+		log.Warn("malformed json")
+		// todo inform user
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	log.Infof(sUrl)
 	w.WriteHeader(http.StatusOK)
 }

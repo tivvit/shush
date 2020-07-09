@@ -46,6 +46,7 @@ func main() {
 		wg.Done()
 	}()
 	wg.Add(1)
+	shush_api.SetBackend(bck)
 	go func() {
 		log.Printf("API Server starting at %s", c.Api.Address)
 		log.Fatal(http.ListenAndServe(c.Api.Address, shush_api.NewRouter()))
