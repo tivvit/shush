@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 func UrlsGet(w http.ResponseWriter, r *http.Request) {
@@ -67,6 +68,12 @@ func UrlsShortUrlPut(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	log.Infof(sUrl)
+	err = bck.Set(sUrl, url.Target, 10 * time.Minute)
+	if err != nil {
+		log.Error(err)
+		// todo inform user
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }

@@ -78,7 +78,7 @@ func initBackend(bc backendConf.Conf) (backend.Backend, error) {
 		return backend.NewInMem(), nil
 	}
 	if bc.JsonFile != nil {
-		return backend.NewJsonFile(bc.JsonFile.Path), nil
+		return backend.NewJsonFile(bc.JsonFile.Path)
 	}
 	if bc.Redis != nil {
 		return backend.NewRedis(&redis.Options{
@@ -91,7 +91,7 @@ func initBackend(bc backendConf.Conf) (backend.Backend, error) {
 		}), nil
 	}
 	if bc.Badger != nil {
-		return backend.NewBadger(badger.DefaultOptions(bc.Badger.Path)), nil
+		return backend.NewBadger(badger.DefaultOptions(bc.Badger.Path))
 	}
 	return nil, errors.New("unknown backend")
 }

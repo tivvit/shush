@@ -3,20 +3,21 @@ package backend
 import (
 	"github.com/dgraph-io/badger"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 type Badger struct {
 	client *badger.DB
 }
 
-func NewBadger(bo badger.Options) *Badger {
+func NewBadger(bo badger.Options) (*Badger, error) {
 	b := &Badger{}
 	db, err := badger.Open(bo)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	b.client = db
-	return b
+	return b, nil
 }
 
 func (b Badger) Get(key string) (string, error) {
@@ -58,19 +59,20 @@ func (b Badger) GetAll() (map[string]string, error) {
 	return m, err
 }
 
-func (b Badger) Set(key string, value string, ttl int) error {
+func (b Badger) Set(key string, value string, ttl time.Duration) error {
 	err := b.client.Update(func(txn *badger.Txn) error {
-		// todo hadle TTL
-		e := badger.NewEntry([]byte(key), []byte(value)) // .WithTTL(time.Hour)
+		var e *badger.Entry
+		if ttl > 0 {
+			e = badger.NewEntry([]byte(key), []byte(value)).WithTTL(ttl)
+		} else {
+			e = badger.NewEntry([]byte(key), []byte(value))
+		}
 		err := txn.SetEntry(e)
 		return err
 	})
 	return err
 }
 
-func (b Badger) Close() {
-	err := b.client.Close()
-	if err != nil {
-		log.Error(err)
-	}
+func (b Badger) Close() error {
+	return b.client.Close()
 }

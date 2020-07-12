@@ -1,4 +1,8 @@
 {
-  "g": "https://google.com/",
-  "s": "https://seznam.cz/"
+  "g": {
+    "data": "https://google.com/"
+  },
+  "s": {
+    "data": "https://seznam.cz/"
+  }
 }

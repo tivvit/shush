@@ -40,6 +40,10 @@ func (r Redis) GetAll() (map[string]string, error) {
 	return m, nil
 }
 
-func (r Redis) Set(key string, value string, ttl int) error {
-	return r.client.Set(key, value, time.Duration(ttl)).Err()
+func (r Redis) Set(key string, value string, ttl time.Duration) error {
+	return r.client.Set(key, value, ttl).Err()
+}
+
+func (r Redis) Close() error {
+	return r.Close()
 }
