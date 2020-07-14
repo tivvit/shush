@@ -9,6 +9,7 @@
 package shush_api
 
 import (
+	"github.com/tivvit/shush/shush/generator"
 	"net/http"
 	"strings"
 
@@ -44,9 +45,14 @@ func NewRouter() *mux.Router {
 }
 
 var bck *backend.ShushBackend
+var gen *generator.ShortUrlGenerator
 
 func SetBackend(b *backend.ShushBackend) {
 	bck = b
+}
+
+func SetGenerator(g *generator.ShortUrlGenerator) {
+	gen = g
 }
 
 var routes = Routes{

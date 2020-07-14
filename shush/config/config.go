@@ -19,11 +19,12 @@ type Server struct {
 }
 
 type Conf struct {
-	Log     Log          `yaml:"log,omitempty"`
-	Server  Server       `yaml:"server,omitempty"`
-	Api     Server       `yaml:"api,omitempty"`
-	Backend backend.Conf `yaml:"backend,omitempty"`
-	Cache   *cache.Conf  `yaml:"cache,omitempty"`
+	Log           Log          `yaml:"log,omitempty"`
+	Server        Server       `yaml:"server,omitempty"`
+	Api           Server       `yaml:"api,omitempty"`
+	Backend       backend.Conf `yaml:"backend,omitempty"`
+	Cache         *cache.Conf  `yaml:"cache,omitempty"`
+	GenUrlPattern string       `yaml:"gen-url-pattern,omitempty"`
 }
 
 func NewConf(fn string) (*Conf, error) {
@@ -51,6 +52,7 @@ func NewConf(fn string) (*Conf, error) {
 func (c *Conf) defaults() {
 	c.Log.Level = "Info"
 	c.Server.Address = "127.0.0.1:8080"
+	c.GenUrlPattern = "[a-zA-Z0-9]{5}"
 }
 
 func (c *Conf) numBackends() int {

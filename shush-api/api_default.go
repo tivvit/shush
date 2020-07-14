@@ -25,7 +25,40 @@ func UrlsGet(w http.ResponseWriter, r *http.Request) {
 
 func UrlsPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	url := model.Url{}
+	b, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Warn("malformed body")
+		// todo inform user
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = json.Unmarshal(b, &url)
+	if err != nil {
+		log.Warn("malformed json")
+		// todo inform user
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	u, err := gen.Generate(url)
+	if err != nil {
+		// todo inform user
+		// todo log
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	su, err := model.UrlSerialize(u)
+	if err != nil {
+		// todo inform user
+		// todo log
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte(su))
+	if err != nil {
+		log.Warnf("response write failed %s", err.Error())
+	}
 }
 
 func UrlsShortUrlDelete(w http.ResponseWriter, r *http.Request) {
@@ -69,8 +102,9 @@ func UrlsShortUrlPut(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	// todo validate struct
 	if url.ShortUrl == "" {
-		url.ShortUrl = sUrl
+		url.ShortUrl = sUrl // todo this is not needed and probably not a great idea
 	}
 	// todo set expiration ttl
 	err = bck.Set(sUrl, url, 10 * time.Minute)

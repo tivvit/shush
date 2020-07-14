@@ -27,7 +27,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Url'
+                $ref: '#/components/schemas/NewUrl'
   /urls/{short_url}:
     get:
       summary: url details
@@ -97,6 +97,24 @@ components:
         - target
       example: {
         "short_url": "g",
+        "target": "https://google.com",
+        "owners": ["tivvit"],
+        "expiration": "2017-07-21T17:32:28Z"
+      }
+    NewUrl:
+      properties:
+        target:
+          type: string
+        owners:
+          type: array
+          items:
+            type: string
+        expiration:
+          type: string
+          format: date-time
+      required:
+        - target
+      example: {
         "target": "https://google.com",
         "owners": ["tivvit"],
         "expiration": "2017-07-21T17:32:28Z"

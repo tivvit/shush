@@ -20,6 +20,16 @@ type Url struct {
 	Expiration *time.Time `json:"expiration,omitempty"`
 }
 
+// todo NewUrlFromJsonString
+
+func UrlDeserialize(v string) (Url, error) {
+	d := Url{}
+	err := json.Unmarshal([]byte(v), &d)
+	return d, err
+}
+
+// todo url method
+
 func UrlSerialize(u Url) (string, error) {
 	r, err := json.Marshal(u)
 	if err != nil {
@@ -28,8 +38,15 @@ func UrlSerialize(u Url) (string, error) {
 	return string(r), nil
 }
 
-func UrlDeserialize(v string) (Url, error) {
-	d := Url{}
-	err := json.Unmarshal([]byte(v), &d)
-	return d, err
-}
+// todo
+// func (u Url) validate()
+// shorturl has to be in some format ?
+// url should be valid?
+
+
+// todo
+// func (u *Url) generateShort(g generator)
+
+
+// todo
+// func (u *Url) store()

@@ -12,6 +12,7 @@ import (
 	"github.com/tivvit/shush/shush/config"
 	backendConf "github.com/tivvit/shush/shush/config/backend"
 	cacheConf "github.com/tivvit/shush/shush/config/cache"
+	"github.com/tivvit/shush/shush/generator"
 	"github.com/valyala/fasthttp"
 	"net/http"
 	"sync"
@@ -47,7 +48,13 @@ func main() {
 		wg.Done()
 	}()
 	wg.Add(1)
-	shush_api.SetBackend(backend.NewShushBackend(bck))
+	sb := backend.NewShushBackend(bck)
+	g, err := generator.NewShortUrlGenerator(cfg.GenUrlPattern, sb)
+	if err != nil {
+		log.Fatal(err)
+	}
+	shush_api.SetBackend(sb)
+	shush_api.SetGenerator(g)
 	go func() {
 		log.Printf("API Server starting at %s", cfg.Api.Address)
 		log.Fatal(http.ListenAndServe(cfg.Api.Address, shush_api.NewRouter()))
