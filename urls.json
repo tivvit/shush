@@ -1,8 +1,8 @@
 {
   "g": {
-    "data": "https://google.com/"
+    "data": "{\"short_url\":\"g\",\"target\":\"https://google.com\"}"
   },
   "s": {
-    "data": "https://seznam.cz/"
+    "data": "{\"short_url\":\"s\",\"target\":\"https://seznam.cz\"}"
   }
 }

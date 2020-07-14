@@ -17,39 +17,40 @@ import (
 	"sync"
 )
 
-var b cache.Cache
+var b *cache.ShushCache
 
 func main() {
 	confFile := flag.String("confFile", "conf.yml", "Configuration file path")
 	flag.Parse()
-	c, err := config.NewConf(*confFile)
+	cfg, err := config.NewConf(*confFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	setupLogger(c.Log)
-	bck, err := initBackend(c.Backend)
+	setupLogger(cfg.Log)
+	bck, err := initBackend(cfg.Backend)
 	if err != nil {
 		log.Fatal(err)
 	}
-	b, err = initCache(bck, c.Cache)
+	cach, err := initCache(bck, cfg.Cache)
 	if err != nil {
 		log.Warn(err)
 	}
+	b = cache.NewShushCache(cach)
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
-		log.Infof("starting server at %s", c.Server.Address)
-		err = fasthttp.ListenAndServe(c.Server.Address, fastHTTPHandler)
+		log.Infof("starting server at %s", cfg.Server.Address)
+		err = fasthttp.ListenAndServe(cfg.Server.Address, fastHTTPHandler)
 		if err != nil {
 			log.Error(err)
 		}
 		wg.Done()
 	}()
 	wg.Add(1)
-	shush_api.SetBackend(bck)
+	shush_api.SetBackend(backend.NewShushBackend(bck))
 	go func() {
-		log.Printf("API Server starting at %s", c.Api.Address)
-		log.Fatal(http.ListenAndServe(c.Api.Address, shush_api.NewRouter()))
+		log.Printf("API Server starting at %s", cfg.Api.Address)
+		log.Fatal(http.ListenAndServe(cfg.Api.Address, shush_api.NewRouter()))
 		wg.Done()
 	}()
 	wg.Wait()
@@ -61,7 +62,7 @@ func fastHTTPHandler(ctx *fasthttp.RequestCtx) {
 	if err != nil {
 		ctx.SetStatusCode(fasthttp.StatusNotFound)
 	} else {
-		ctx.Redirect(url, fasthttp.StatusFound)
+		ctx.Redirect(url.Target, fasthttp.StatusFound)
 	}
 }
 

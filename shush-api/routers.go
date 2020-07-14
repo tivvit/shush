@@ -43,9 +43,9 @@ func NewRouter() *mux.Router {
 	return router
 }
 
-var bck backend.Backend
+var bck *backend.ShushBackend
 
-func SetBackend(b backend.Backend) {
+func SetBackend(b *backend.ShushBackend) {
 	bck = b
 }
 

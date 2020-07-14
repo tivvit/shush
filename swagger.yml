@@ -95,10 +95,9 @@ components:
       required:
         - short_url
         - target
-        - owners
       example: {
         "short_url": "g",
-        "target": "https://gogle.com",
+        "target": "https://google.com",
         "owners": ["tivvit"],
         "expiration": "2017-07-21T17:32:28Z"
       }

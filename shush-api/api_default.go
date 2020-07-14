@@ -12,6 +12,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"github.com/tivvit/shush/shush/model"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -36,7 +37,7 @@ func UrlsShortUrlGet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	p := mux.Vars(r)
 	sUrl := p["short_url"]
-	v, err := bck.Get(sUrl)
+	v, err := bck.GetRaw(sUrl)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		//w.Write() // todo
@@ -53,7 +54,7 @@ func UrlsShortUrlPut(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	p := mux.Vars(r)
 	sUrl := p["short_url"]
-	url := Url{}
+	url := model.Url{}
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Warn("malformed body")
@@ -68,7 +69,11 @@ func UrlsShortUrlPut(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	err = bck.Set(sUrl, url.Target, 10 * time.Minute)
+	if url.ShortUrl == "" {
+		url.ShortUrl = sUrl
+	}
+	// todo set expiration ttl
+	err = bck.Set(sUrl, url, 10 * time.Minute)
 	if err != nil {
 		log.Error(err)
 		// todo inform user
