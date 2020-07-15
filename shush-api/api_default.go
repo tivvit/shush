@@ -40,36 +40,42 @@ func UrlsGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func UrlsPost(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	url := model.Url{}
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Warn("malformed body")
-		// todo inform user
+		log.Warn("malformed request body", err)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
+		_, err = w.Write([]byte(`{"error": "malformed request body"}`))
+		if err != nil {
+			log.Warnf("response write failed %s", err.Error())
+		}
 		return
 	}
 	err = json.Unmarshal(b, &url)
 	if err != nil {
-		log.Warn("malformed json")
-		// todo inform user
+		log.Warn("malformed json", err)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
+		_, err = w.Write([]byte(`{"error": "malformed json body"}`))
+		if err != nil {
+			log.Warnf("response write failed %s", err.Error())
+		}
 		return
 	}
 	u, err := gen.Generate(url)
 	if err != nil {
-		// todo inform user
-		// todo log
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	su, err := model.UrlSerialize(u)
 	if err != nil {
-		// todo inform user
-		// todo log
+		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte(su))
 	if err != nil {
@@ -90,7 +96,6 @@ func UrlsShortUrlGet(w http.ResponseWriter, r *http.Request) {
 	v, err := bck.GetRaw(sUrl)
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		//w.Write() // todo
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -107,28 +112,39 @@ func UrlsShortUrlPut(w http.ResponseWriter, r *http.Request) {
 	url := model.Url{}
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Warn("malformed body")
-		// todo inform user
+		log.Warn("malformed request body", err)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
+		_, err = w.Write([]byte(`{"error": "malformed request body"}`))
+		if err != nil {
+			log.Warnf("response write failed %s", err.Error())
+		}
 		return
 	}
 	err = json.Unmarshal(b, &url)
 	if err != nil {
-		log.Warn("malformed json")
-		// todo inform user
+		log.Warn("malformed json", err)
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusBadRequest)
+		_, err = w.Write([]byte(`{"error": "malformed json body"}`))
+		if err != nil {
+			log.Warnf("response write failed %s", err.Error())
+		}
 		return
 	}
 	// todo validate struct
 	if url.ShortUrl == "" {
 		url.ShortUrl = sUrl // todo this is not needed and probably not a great idea
 	}
-	// todo set expiration ttl
-	err = bck.Set(sUrl, url, 10 * time.Minute)
+	if url.Expiration != nil {
+		d := url.Expiration.Sub(time.Now())
+		err = bck.Set(sUrl, url, d)
+	} else {
+		err = bck.Set(sUrl, url, time.Duration(0))
+	}
 	if err != nil {
 		log.Error(err)
-		// todo inform user
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
