@@ -19,8 +19,24 @@ import (
 )
 
 func UrlsGet(w http.ResponseWriter, r *http.Request) {
+	all, err := bck.GetAll()
+	if err != nil {
+		log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	js, err := json.Marshal(all)
+	if err != nil {
+		log.Error(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(js)
+	if err != nil {
+		log.Warnf("response write failed %s", err.Error())
+	}
 }
 
 func UrlsPost(w http.ResponseWriter, r *http.Request) {
@@ -63,6 +79,7 @@ func UrlsPost(w http.ResponseWriter, r *http.Request) {
 
 func UrlsShortUrlDelete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	// todo
 	w.WriteHeader(http.StatusOK)
 }
 
