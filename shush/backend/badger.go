@@ -73,6 +73,13 @@ func (b Badger) Set(key string, value string, ttl time.Duration) error {
 	return err
 }
 
+func (b Badger) Remove(key string) error {
+	err := b.client.Update(func(txn *badger.Txn) error {
+		return txn.Delete([]byte(key))
+	})
+	return err
+}
+
 func (b Badger) Close() error {
 	return b.client.Close()
 }

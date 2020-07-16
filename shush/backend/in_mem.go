@@ -84,6 +84,13 @@ func (im InMem) Set(key string, value string, ttl time.Duration) error {
 	return nil
 }
 
+func (im InMem) Remove(key string) error {
+	if _, ok := im.data[key]; ok {
+		delete(im.data, key)
+	}
+	return nil
+}
+
 func (im *InMem) Close() error {
 	im.close <- true
 	im.wg.Wait()

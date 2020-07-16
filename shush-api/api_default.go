@@ -84,8 +84,13 @@ func UrlsPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func UrlsShortUrlDelete(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	// todo
+	p := mux.Vars(r)
+	sUrl := p["short_url"]
+	err := bck.Remove(sUrl)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	w.WriteHeader(http.StatusOK)
 }
 

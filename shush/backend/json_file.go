@@ -62,6 +62,14 @@ func (jf JsonFile) Set(key string, value string, ttl time.Duration) error {
 	return jf.write()
 }
 
+func (jf JsonFile) Remove(key string) error {
+	err := jf.data.Remove(key)
+	if err != nil {
+		return err
+	}
+	return jf.write()
+}
+
 func (jf JsonFile) Close() error {
 	return jf.data.Close()
 }

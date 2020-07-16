@@ -10,6 +10,7 @@ type Backend interface {
 	Get(string) (string, error)
 	GetAll() (map[string]string, error)
 	Set(string, string, time.Duration) error
+	Remove(string) error
 	Close() error
 }
 
@@ -58,6 +59,11 @@ func (sb ShushBackend) Set(k string, v model.Url, d time.Duration) error {
 		return err
 	}
 	return sb.backend.Set(k, sv, d)
+}
+
+
+func (sb ShushBackend) Remove(key string) error {
+	return sb.backend.Remove(key)
 }
 
 func (sb ShushBackend) Close() error {

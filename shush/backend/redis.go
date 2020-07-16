@@ -44,6 +44,11 @@ func (r Redis) Set(key string, value string, ttl time.Duration) error {
 	return r.client.Set(key, value, ttl).Err()
 }
 
+func (r Redis) Remove(key string) error {
+	_, err := r.client.Del(key).Result()
+	return err
+}
+
 func (r Redis) Close() error {
 	return r.Close()
 }
