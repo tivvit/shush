@@ -12,7 +12,7 @@ import (
 	"github.com/tivvit/shush/shush/config"
 	backendConf "github.com/tivvit/shush/shush/config/backend"
 	cacheConf "github.com/tivvit/shush/shush/config/cache"
-	"github.com/tivvit/shush/shush/generator"
+	"github.com/tivvit/shush/shush/shortner"
 	"github.com/valyala/fasthttp"
 	"net/http"
 	"sync"
@@ -49,7 +49,7 @@ func main() {
 	}()
 	wg.Add(1)
 	sb := backend.NewShushBackend(bck)
-	g, err := generator.NewShortUrlGenerator(cfg.GenUrlPattern, sb)
+	g, err := shortner.NewShortUrlGenerator(cfg.GenUrlPattern, sb)
 	if err != nil {
 		log.Fatal(err)
 	}

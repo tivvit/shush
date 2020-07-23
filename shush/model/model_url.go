@@ -45,7 +45,7 @@ func UrlSerialize(u Url) (string, error) {
 
 
 // todo
-// func (u *Url) generateShort(g generator)
+// func (u *Url) generateShort(g shortner)
 
 
 // todo

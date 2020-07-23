@@ -1,4 +1,4 @@
-package generator
+package shortner
 
 import (
 	"github.com/lucasjones/reggen"
