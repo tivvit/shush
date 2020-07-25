@@ -61,6 +61,11 @@ func (sb ShushBackend) Set(k string, v model.Url, d time.Duration) error {
 	return sb.backend.Set(k, sv, d)
 }
 
+// set only if not present (atomic if possible)
+func (sb ShushBackend) SetUnique(k string, v model.Url, d time.Duration) error {
+	// todo not implemented
+	return sb.Set(k, v, d)
+}
 
 func (sb ShushBackend) Remove(key string) error {
 	return sb.backend.Remove(key)
