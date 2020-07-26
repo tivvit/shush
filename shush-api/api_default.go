@@ -123,8 +123,9 @@ func UrlsPost(w http.ResponseWriter, r *http.Request) {
 			lenParam, err := strconv.Atoi(lenParamStr)
 			if err == nil {
 				log.Debug(err)
+			} else {
+				ln = lenParam
 			}
-			ln = lenParam
 		}
 		switch shortener {
 		case "generator":
