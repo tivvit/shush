@@ -49,12 +49,12 @@ func main() {
 	}()
 	wg.Add(1)
 	sb := backend.NewShushBackend(bck)
-	g, err := shortner.NewShortUrlGenerator(cfg.GenUrlPattern, sb)
+	s, err := shortner.NewShortner(sb, cfg.GenUrlPattern)
 	if err != nil {
 		log.Fatal(err)
 	}
 	shush_api.SetBackend(sb)
-	shush_api.SetGenerator(g)
+	shush_api.SetGenerator(s)
 	go func() {
 		log.Printf("API Server starting at %s", cfg.Api.Address)
 		log.Fatal(http.ListenAndServe(cfg.Api.Address, shush_api.NewRouter()))

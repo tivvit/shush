@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/tivvit/shush/shush/backend"
 	"github.com/tivvit/shush/shush/model"
-	"time"
 )
 
 type Shortner struct {
@@ -34,7 +33,7 @@ func checkShorturlEmpty(u *model.Url) error {
 }
 
 // Hash updates short_url param in-place and store the result in the backend
-func (s Shortner) Hash(u *model.Url, fn string, ln int, d time.Duration) error {
+func (s Shortner) Hash(u *model.Url, fn string, ln int) error {
 	err := checkShorturlEmpty(u)
 	if err != nil {
 		return err
@@ -44,11 +43,11 @@ func (s Shortner) Hash(u *model.Url, fn string, ln int, d time.Duration) error {
 		return err
 	}
 	if _, err := s.b.Get(h); err == nil {
-		return errors.New("already present")
+		return fmt.Errorf("already present %s", h)
 	}
 	// todo only non-existent error should be valid here
 	u.ShortUrl = h
-	return s.b.SetUnique(h, *u, d)
+	return s.b.SetUnique(h, *u, u.Expires())
 }
 
 // Random updates short_url param in-place based on random pattern and store the result in the backend
@@ -72,7 +71,7 @@ func (s Shortner) Random(u *model.Url, ln int) error {
 		}
 		// todo only non-existent error should be valid here
 		u.ShortUrl = sUrl
-		err = s.b.SetUnique(sUrl, *u, time.Duration(0))
+		err = s.b.SetUnique(sUrl, *u, u.Expires())
 		if err != nil {
 			continue
 		}

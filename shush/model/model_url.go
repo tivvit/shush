@@ -20,6 +20,13 @@ type Url struct {
 	Expiration *time.Time `json:"expiration,omitempty"`
 }
 
+func (u Url) Expires() time.Duration {
+	if u.Expiration != nil {
+		return u.Expiration.Sub(time.Now())
+	}
+	return time.Duration(0)
+}
+
 // todo NewUrlFromJsonString
 
 func UrlDeserialize(v string) (Url, error) {
@@ -37,6 +44,7 @@ func UrlSerialize(u Url) (string, error) {
 	}
 	return string(r), nil
 }
+
 
 // todo
 // func (u Url) validate()

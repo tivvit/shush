@@ -45,14 +45,14 @@ func NewRouter() *mux.Router {
 }
 
 var bck *backend.ShushBackend
-var gen *shortner.ShortUrlGenerator
+var short *shortner.Shortner
 
 func SetBackend(b *backend.ShushBackend) {
 	bck = b
 }
 
-func SetGenerator(g *shortner.ShortUrlGenerator) {
-	gen = g
+func SetGenerator(s *shortner.Shortner) {
+	short = s
 }
 
 var routes = Routes{

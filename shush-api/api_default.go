@@ -12,10 +12,11 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
+	"github.com/tivvit/shush/shush/backend"
 	"github.com/tivvit/shush/shush/model"
 	"io/ioutil"
 	"net/http"
-	"time"
+	"strconv"
 )
 
 func UrlsGet(w http.ResponseWriter, r *http.Request) {
@@ -63,13 +64,88 @@ func UrlsPost(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	u, err := gen.Generate(url)
-	if err != nil {
-		log.Error(err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+	// shortUrl us provided
+	if url.ShortUrl != "" {
+		// todo inform user
+		err := storeUrl(bck, url.ShortUrl, url)
+		if err != nil {
+			log.Error(err)
+			// todo internal?
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	} else {
+		// todo config
+		defaultShortener := "generator"
+		allowedShorteners := map[string]bool{
+			"generator": true,
+			"hash":      true,
+		}
+		allowedHashAlgo := map[string]bool{
+			"md5":       true,
+			"sha1":      true,
+			"sha256":    true,
+			"sha512":    true,
+			"fnv32":     true,
+			"fnv32a":    true,
+			"fnv64":     true,
+			"fnv64a":    true,
+			"fnv128":    true,
+			"fnv128a":   true,
+			"adler32":   true,
+			"crc32ieee": true,
+			"crc64iso":  true,
+			"crc64ecma": true,
+		}
+		defaultHashAlgo := "fnv32"
+		defaultLen := 5
+		// conf end
+		var shortener string
+		shortener = defaultShortener
+		shortenerParam := r.URL.Query().Get("shortener")
+		if shortenerParam != "" {
+			if _, ok := allowedShorteners[shortenerParam]; ok {
+				shortener = shortenerParam
+			}
+		}
+		var hashAlgo string
+		hashAlgo = defaultHashAlgo
+		hashAlgoParam := r.URL.Query().Get("algo")
+		if hashAlgoParam != "" {
+			if _, ok := allowedHashAlgo[hashAlgoParam]; ok {
+				hashAlgo = hashAlgoParam
+			}
+		}
+		var ln int
+		ln = defaultLen
+		lenParamStr := r.URL.Query().Get("len")
+		if lenParamStr != "" {
+			lenParam, err := strconv.Atoi(lenParamStr)
+			if err == nil {
+				log.Debug(err)
+			}
+			ln = lenParam
+		}
+		switch shortener {
+		case "generator":
+			err := short.Random(&url, ln)
+			if err != nil {
+				log.Error(err)
+				// todo does not have to be internal
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		case "hash":
+			err := short.Hash(&url, hashAlgo, ln)
+			if err != nil {
+				log.Error(err)
+				// todo does not have to be internal
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+		}
 	}
-	su, err := model.UrlSerialize(u)
+	su, err := model.UrlSerialize(url)
 	if err != nil {
 		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -141,16 +217,15 @@ func UrlsShortUrlPut(w http.ResponseWriter, r *http.Request) {
 	if url.ShortUrl == "" {
 		url.ShortUrl = sUrl // todo this is not needed and probably not a great idea
 	}
-	if url.Expiration != nil {
-		d := url.Expiration.Sub(time.Now())
-		err = bck.Set(sUrl, url, d)
-	} else {
-		err = bck.Set(sUrl, url, time.Duration(0))
-	}
+	err = storeUrl(bck, sUrl, url)
 	if err != nil {
 		log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+func storeUrl(bck *backend.ShushBackend, sUrl string, url model.Url) error {
+	return bck.Set(sUrl, url, url.Expires())
 }
