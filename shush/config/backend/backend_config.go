@@ -1,7 +1,6 @@
 package backend
 
-type InMem struct {
-}
+type InMem struct{}
 
 type JsonFile struct {
 	Path string `yaml:"path"`
@@ -16,9 +15,8 @@ type Badger struct {
 }
 
 type Conf struct {
-	InMem    *InMem    `yaml:"in-mem,omitempty"`
-	JsonFile *JsonFile `yaml:"json-file,omitempty"`
-	Redis    *Redis    `yaml:"redis,omitempty"`
-	Badger   *Badger   `yaml:"badger,omitempty"`
+	InMem    *InMem    `yaml:"in-mem,omitempty" mapstructure:"in-mem"`
+	JsonFile *JsonFile `yaml:"json-file,omitempty" mapstructure:"json-file"`
+	Redis    *Redis    `yaml:"redis,omitempty" mapstructure:"redis"`
+	Badger   *Badger   `yaml:"badger,omitempty" mapstructure:"badger"`
 }
-

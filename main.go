@@ -21,7 +21,8 @@ import (
 var b *cache.ShushCache
 
 func main() {
-	confFile := flag.String("confFile", "conf.yml", "Configuration file path")
+	// todo use Cobra
+	confFile := flag.String("confFile", "", "Configuration file path")
 	flag.Parse()
 	cfg, err := config.NewConf(*confFile)
 	if err != nil {
