@@ -24,7 +24,7 @@ type Conf struct {
 	Api           Server
 	Backend       backend.Conf
 	Cache         *cache.Conf
-	GenUrlPattern string `mapstructure:"gen-url-pattern"`
+	GenUrlPattern string `mapstructure:"gen-url-pattern"` // todo shotener conf
 }
 
 func NewConf(fn string) (*Conf, error) {
@@ -54,13 +54,7 @@ func NewConf(fn string) (*Conf, error) {
 	viper.SetDefault("server.address", "127.0.0.1:8080")
 	viper.SetDefault("api.address", "127.0.0.1:8081")
 	viper.SetDefault("gen-url-pattern", "[a-zA-Z0-9]{5}")
-	// todo
-	// default backend (badger)
-	viper.SetDefault("backend.in-mem", backend.InMem{})
-	// default cache (big-cache? - based on tests)
-
-	// todo
-	//viper.WatchConfig()
+	viper.SetDefault("backend.badger", backend.Badger{Path: "badger"})
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "_"))
 	viper.SetEnvPrefix("shush")
