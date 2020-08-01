@@ -39,7 +39,27 @@ backend:
 Only one cache may be configured (no default)
 ```yaml
 cache:
-  todo cache
+  big-cache: # head to https://github.com/allegro/bigcache#custom-initialization for detailed explanation of config values
+    life-window-sec: 600 # entry TTL
+    shards-pow: 10 # optional, 2 ** n, number of cache shards
+    clean-window-sec: 0 # optional, how often should garbage collection run
+    max-entries-in-window: 600000 # optional
+    max-entry-size-bytes: 500 # optional
+    verbose: true # optional
+    hard-max-cache-size-mb: 1024 # optional
+  free-cache: # https://github.com/coocood/freecache
+    expire-sec: 600 # entry TTL
+    size-kb: 1048576 # max cache size in kB
+    gc-percent: # optional, edit go runtime gc config
+  lru-cache: # github.com/evamayerova/lrucache
+    expire-sec: 600 # entry TTL
+    max-elems: 10000000 # max number of elements (keys)
+  fast-cache:
+    size-bytes: 1073741824 # max cache size in Bytes
+  ristretto-cache:
+    counters: 100000000 # should be bigger than max-cost (keeps track about access for eviction)
+    max-cost: 10000000 # max number of elements (keys)
+    metrics: false # optional, statistics for debugging
 ```
 todo shortener 
 
