@@ -2,18 +2,18 @@ package cache
 
 type Big struct {
 	LifeWindowSec      int   `mapstructure:"life-window-sec"`
-	ShardsPow          *int  `mapstructure:"shards-pow,omitempty"`
-	CleanWindowSec     *int  `mapstructure:"clean-window-sec,omitempty"`
-	MaxEntriesInWindow *int  `mapstructure:"max-entries-in-window,omitempty"`
-	MaxEntrySizeBytes  *int  `mapstructure:"max-entry-size-bytes,omitempty"`
-	Verbose            *bool `mapstructure:"verbose,omitempty"`
-	HardMaxCacheSizeMb *int  `mapstructure:"hard-max-cache-size-mb,omitempty"`
+	ShardsPow          *int  `mapstructure:"shards-pow"`
+	CleanWindowSec     *int  `mapstructure:"clean-window-sec"`
+	MaxEntriesInWindow *int  `mapstructure:"max-entries-in-window"`
+	MaxEntrySizeBytes  *int  `mapstructure:"max-entry-size-bytes"`
+	Verbose            *bool `mapstructure:"verbose"`
+	HardMaxCacheSizeMb *int  `mapstructure:"hard-max-cache-size-mb"`
 }
 
 type Free struct {
 	CacheSizeKb int  `mapstructure:"size-kb"`
 	ExpireSec   int  `mapstructure:"expire-sec"`
-	GcPercent   *int `mapstructure:"gc-percent,omitempty"`
+	GcPercent   *int `mapstructure:"gc-percent"`
 }
 
 type Lru struct {
@@ -28,7 +28,7 @@ type Fast struct {
 type Ristretto struct {
 	Counters int64 `mapstructure:"counters"`
 	MaxCost  int64 `mapstructure:"max-cost"`
-	Metrics  *bool `mapstructure:"metrics,omitempty"`
+	Metrics  *bool `mapstructure:"metrics"`
 }
 
 type Conf struct {
