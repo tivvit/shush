@@ -54,9 +54,9 @@ cache:
   lru-cache: # github.com/evamayerova/lrucache
     expire-sec: 600 # entry TTL
     max-elems: 10000000 # max number of elements (keys)
-  fast-cache:
+  fast-cache: # https://github.com/VictoriaMetrics/fastcache
     size-bytes: 1073741824 # max cache size in Bytes
-  ristretto-cache:
+  ristretto-cache: # https://github.com/dgraph-io/ristretto
     counters: 100000000 # should be bigger than max-cost (keeps track about access for eviction)
     max-cost: 10000000 # max number of elements (keys)
     metrics: false # optional, statistics for debugging
