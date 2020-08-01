@@ -34,8 +34,7 @@ func NewConf(fn string) (*Conf, error) {
 		viper.AddConfigPath(".")           // optionally look for config in the working directory
 		if err := viper.ReadInConfig(); err != nil {
 			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-				// todo reasonable defaults
-				// Config file not found; ignore error if desired
+				log.Info("No config file loaded, using defaults")
 			} else {
 				log.Fatalf("Fatal error config file: %s \n", err)
 			}
@@ -48,13 +47,14 @@ func NewConf(fn string) (*Conf, error) {
 		if err != nil {
 			log.Fatalf("Fatal error config file: %s \n", err)
 		}
+		log.Infof("Used config file %s", viper.ConfigFileUsed())
 	}
 
 	viper.SetDefault("log.level", "Info")
 	viper.SetDefault("server.address", "127.0.0.1:8080")
 	viper.SetDefault("api.address", "127.0.0.1:8081")
-	viper.SetDefault("gen-url-pattern", "[a-zA-Z0-9]{5}")
 	viper.SetDefault("backend.badger", backend.Badger{Path: "badger"})
+	viper.SetDefault("gen-url-pattern", "[a-zA-Z0-9]{5}")
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "_"))
 	viper.SetEnvPrefix("shush")
