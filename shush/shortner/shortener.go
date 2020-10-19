@@ -5,23 +5,26 @@ import (
 	"errors"
 	"fmt"
 	"github.com/tivvit/shush/shush/backend"
+	"github.com/tivvit/shush/shush/config/shortner"
 	"github.com/tivvit/shush/shush/model"
 )
 
 type Shortner struct {
+	Conf shortner.Conf
 	gen  *ShortUrlGenerator
 	b    *backend.ShushBackend
 }
 
-// todo will accept conf object
-func NewShortner(b *backend.ShushBackend, pattern string) (*Shortner, error) {
-	shortUrlGen, err := NewShortUrlGenerator(pattern)
+// todo will accept Conf object
+func NewShortner(b *backend.ShushBackend, conf shortner.Conf) (*Shortner, error) {
+	shortUrlGen, err := NewShortUrlGenerator(conf.GenUrlPattern)
 	if err != nil {
 		return &Shortner{}, err
 	}
 	return &Shortner{
-		gen: shortUrlGen,
-		b: b,
+		gen:  shortUrlGen,
+		b:    b,
+		Conf: conf,
 	}, nil
 }
 
@@ -56,10 +59,8 @@ func (s Shortner) Random(u *model.Url, ln int) error {
 	if err != nil {
 		return err
 	}
-	// todo configurable retry
-	maxRetry := 10
-	for i := 0; i < maxRetry; i++ {
-		// todo from conf / request
+	for i := 0; i < s.Conf.GenMaxRetries; i++ {
+		// todo from Conf / request
 		sUrl, err := s.gen.Generate(ln)
 		if err != nil {
 			// this error is not recoverable
@@ -77,5 +78,5 @@ func (s Shortner) Random(u *model.Url, ln int) error {
 		}
 		return nil
 	}
-	return fmt.Errorf("tried %d times and did not find unique short_url (pattern is probably almost exhausted)", maxRetry)
+	return fmt.Errorf("tried %d times and did not find unique short_url (pattern is probably almost exhausted)", s.Conf.GenMaxRetries)
 }

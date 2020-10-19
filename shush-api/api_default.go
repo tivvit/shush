@@ -75,49 +75,24 @@ func UrlsPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		// todo config
-		defaultShortener := "generator"
-		allowedShorteners := map[string]bool{
-			"generator": true,
-			"hash":      true,
-		}
-		allowedHashAlgo := map[string]bool{
-			"md5":       true,
-			"sha1":      true,
-			"sha256":    true,
-			"sha512":    true,
-			"fnv32":     true,
-			"fnv32a":    true,
-			"fnv64":     true,
-			"fnv64a":    true,
-			"fnv128":    true,
-			"fnv128a":   true,
-			"adler32":   true,
-			"crc32ieee": true,
-			"crc64iso":  true,
-			"crc64ecma": true,
-		}
-		defaultHashAlgo := "fnv32"
-		defaultLen := 5
-		// conf end
 		var shortener string
-		shortener = defaultShortener
+		shortener = short.Conf.DefaultShortener
 		shortenerParam := r.URL.Query().Get("shortener")
 		if shortenerParam != "" {
-			if _, ok := allowedShorteners[shortenerParam]; ok {
+			if _, ok := short.Conf.AllowedShorteners[shortenerParam]; ok {
 				shortener = shortenerParam
 			}
 		}
 		var hashAlgo string
-		hashAlgo = defaultHashAlgo
+		hashAlgo = short.Conf.DefaultHashAlgo
 		hashAlgoParam := r.URL.Query().Get("algo")
 		if hashAlgoParam != "" {
-			if _, ok := allowedHashAlgo[hashAlgoParam]; ok {
+			if _, ok := short.Conf.AllowedHashAlgo[hashAlgoParam]; ok {
 				hashAlgo = hashAlgoParam
 			}
 		}
 		var ln int
-		ln = defaultLen
+		ln = short.Conf.DefaultLen
 		lenParamStr := r.URL.Query().Get("len")
 		if lenParamStr != "" {
 			lenParam, err := strconv.Atoi(lenParamStr)

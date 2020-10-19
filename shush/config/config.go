@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tivvit/shush/shush/config/backend"
 	"github.com/tivvit/shush/shush/config/cache"
+	"github.com/tivvit/shush/shush/config/shortner"
 	"reflect"
 	"strings"
 )
@@ -19,12 +20,12 @@ type Server struct {
 }
 
 type Conf struct {
-	Log           Log
-	Server        Server
-	Api           Server
-	Backend       backend.Conf
-	Cache         *cache.Conf
-	GenUrlPattern string `mapstructure:"gen-url-pattern"` // todo shotener conf
+	Log       Log
+	Server    Server
+	Api       Server
+	Backend   backend.Conf
+	Cache     *cache.Conf
+	Shortener shortner.Conf
 }
 
 func NewConf(fn string) (*Conf, error) {
@@ -53,8 +54,31 @@ func NewConf(fn string) (*Conf, error) {
 	viper.SetDefault("log.level", "Info")
 	viper.SetDefault("server.address", "127.0.0.1:8080")
 	viper.SetDefault("api.address", "127.0.0.1:8081")
-	viper.SetDefault("backend.badger", backend.Badger{Path: "badger"})
-	viper.SetDefault("gen-url-pattern", "[a-zA-Z0-9]{5}")
+	viper.SetDefault("backend.badger", &backend.Badger{Path: "badger"})
+	viper.SetDefault("shortener.gen-url-pattern", "[a-zA-Z0-9]{5}")
+	viper.SetDefault("shortener.default-shortener", "generator")
+	viper.SetDefault("shortener.default-hash-algo", "fnv32")
+	viper.SetDefault("shortener.default-len", "5")
+	viper.SetDefault("shortener.allowed-shorteners", map[string]bool{
+		"generator": true,
+		"hash":      true,
+	})
+	viper.SetDefault("shortener.allowed-hash-algo", map[string]bool{
+		"md5":       true,
+		"sha1":      true,
+		"sha256":    true,
+		"sha512":    true,
+		"fnv32":     true,
+		"fnv32a":    true,
+		"fnv64":     true,
+		"fnv64a":    true,
+		"fnv128":    true,
+		"fnv128a":   true,
+		"adler32":   true,
+		"crc32ieee": true,
+		"crc64iso":  true,
+		"crc64ecma": true,
+	})
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "_"))
 	viper.SetEnvPrefix("shush")

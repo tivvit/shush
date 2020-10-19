@@ -50,7 +50,7 @@ func main() {
 	}()
 	wg.Add(1)
 	sb := backend.NewShushBackend(bck)
-	s, err := shortner.NewShortner(sb, cfg.GenUrlPattern)
+	s, err := shortner.NewShortner(sb, cfg.Shortener)
 	if err != nil {
 		log.Fatal(err)
 	}
