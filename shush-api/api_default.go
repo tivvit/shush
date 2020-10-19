@@ -67,6 +67,7 @@ func UrlsPost(w http.ResponseWriter, r *http.Request) {
 	// shortUrl us provided
 	if url.ShortUrl != "" {
 		// todo inform user
+		// todo validate short_url
 		err := storeUrl(bck, url.ShortUrl, url)
 		if err != nil {
 			log.Error(err)
