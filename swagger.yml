@@ -53,6 +53,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Url'
+        '400':
+          description: Invalid param
+            content:
+              application/json:
+                schema:
+                  properties:
+                    error:
+                      type: string
   /urls/{short_url}:
     get:
       summary: url details

@@ -5,7 +5,7 @@ services:
     ports:
       - 80:8080
     volumes:
-      - "./conf-example.yml:/app/conf.yml"
+      - "./conf-example.yml:/app/config.yml"
       - "./urls.json:/app/urls.json"
   redis:
     image: redis
