@@ -34,6 +34,9 @@ func TestConf(t *testing.T) {
 	if c.Shortener.DefaultLen != 5 {
 		t.Error("Default len is not 5")
 	}
+	if c.Shortener.Maxlen != 50 {
+		t.Error("Max len is not 50")
+	}
 	if !c.Shortener.AllowedHashAlgo["md5"] {
 		t.Error("md5 is not allowed by default")
 	}

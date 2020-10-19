@@ -7,24 +7,26 @@ import (
 	"github.com/tivvit/shush/shush/backend"
 	"github.com/tivvit/shush/shush/config/shortner"
 	"github.com/tivvit/shush/shush/model"
+	"regexp"
 )
 
 type Shortner struct {
-	Conf shortner.Conf
-	gen  *ShortUrlGenerator
-	b    *backend.ShushBackend
+	Conf    shortner.Conf
+	gen     *ShortUrlGenerator
+	b       *backend.ShushBackend
+	shortRe *regexp.Regexp
 }
 
-// todo will accept Conf object
 func NewShortner(b *backend.ShushBackend, conf shortner.Conf) (*Shortner, error) {
 	shortUrlGen, err := NewShortUrlGenerator(conf.GenUrlPattern)
 	if err != nil {
 		return &Shortner{}, err
 	}
 	return &Shortner{
-		gen:  shortUrlGen,
-		b:    b,
-		Conf: conf,
+		gen:     shortUrlGen,
+		b:       b,
+		Conf:    conf,
+		shortRe: regexp.MustCompile(conf.ValidUrlPattern),
 	}, nil
 }
 
@@ -33,6 +35,10 @@ func checkShorturlEmpty(u *model.Url) error {
 		return errors.New("short_url already present")
 	}
 	return nil
+}
+
+func (s Shortner) IsValidShort(short string) bool {
+	return s.shortRe.MatchString(short)
 }
 
 // Hash updates short_url param in-place and store the result in the backend
@@ -60,7 +66,6 @@ func (s Shortner) Random(u *model.Url, ln int) error {
 		return err
 	}
 	for i := 0; i < s.Conf.GenMaxRetries; i++ {
-		// todo from Conf / request
 		sUrl, err := s.gen.Generate(ln)
 		if err != nil {
 			// this error is not recoverable

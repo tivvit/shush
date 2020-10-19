@@ -10,6 +10,7 @@ package shush_api
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"github.com/tivvit/shush/shush/backend"
@@ -32,9 +33,14 @@ func UrlsGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	returnJson(w, http.StatusOK, js)
+	return
+}
+
+func returnJson(w http.ResponseWriter, statusCode int, message []byte) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	_, err = w.Write(js)
+	w.WriteHeader(statusCode)
+	_, err := w.Write(message)
 	if err != nil {
 		log.Warnf("response write failed %s", err.Error())
 	}
@@ -45,29 +51,22 @@ func UrlsPost(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Warn("malformed request body", err)
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(http.StatusBadRequest)
-		_, err = w.Write([]byte(`{"error": "malformed request body"}`))
-		if err != nil {
-			log.Warnf("response write failed %s", err.Error())
-		}
+		returnJson(w, http.StatusBadRequest, []byte(`{"error": "malformed request body"}`))
 		return
 	}
 	err = json.Unmarshal(b, &url)
 	if err != nil {
 		log.Warn("malformed json", err)
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(http.StatusBadRequest)
-		_, err = w.Write([]byte(`{"error": "malformed json body"}`))
-		if err != nil {
-			log.Warnf("response write failed %s", err.Error())
-		}
+		returnJson(w, http.StatusBadRequest, []byte(`{"error": "malformed json body"}`))
 		return
 	}
 	// shortUrl us provided
 	if url.ShortUrl != "" {
-		// todo inform user
-		// todo validate short_url
+		// todo inform user (about using bad method?)
+		if !short.IsValidShort(url.ShortUrl) {
+			returnJson(w, http.StatusBadRequest, []byte(fmt.Sprintf(`{"error": "invalid short_url %s"}`, url.ShortUrl)))
+			return
+		}
 		err := storeUrl(bck, url.ShortUrl, url)
 		if err != nil {
 			log.Error(err)
@@ -76,30 +75,43 @@ func UrlsPost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		var shortener string
-		shortener = short.Conf.DefaultShortener
+		shortener := short.Conf.DefaultShortener
 		shortenerParam := r.URL.Query().Get("shortener")
 		if shortenerParam != "" {
-			if _, ok := short.Conf.AllowedShorteners[shortenerParam]; ok {
+			if allowed, ok := short.Conf.AllowedShorteners[shortenerParam]; ok && allowed {
 				shortener = shortenerParam
+			} else {
+				returnJson(w, http.StatusBadRequest, []byte(fmt.Sprintf(`{"error": "unknown shortener type %s"}`, shortenerParam)))
+				return
 			}
 		}
-		var hashAlgo string
-		hashAlgo = short.Conf.DefaultHashAlgo
+		hashAlgo := short.Conf.DefaultHashAlgo
 		hashAlgoParam := r.URL.Query().Get("algo")
+
 		if hashAlgoParam != "" {
-			if _, ok := short.Conf.AllowedHashAlgo[hashAlgoParam]; ok {
+			if shortener != "shortner" {
+				returnJson(w, http.StatusBadRequest, []byte(`{"error": "defined hash type for non-hash shortener"}`))
+				return
+			}
+			if allowed, ok := short.Conf.AllowedHashAlgo[hashAlgoParam]; ok && allowed {
 				hashAlgo = hashAlgoParam
+			} else {
+				returnJson(w, http.StatusBadRequest, []byte(fmt.Sprintf(`{"error": "unknown hash type %s"}`, hashAlgoParam)))
+				return
 			}
 		}
-		var ln int
-		ln = short.Conf.DefaultLen
+		ln := short.Conf.DefaultLen
 		lenParamStr := r.URL.Query().Get("len")
 		if lenParamStr != "" {
 			lenParam, err := strconv.Atoi(lenParamStr)
-			if err == nil {
-				log.Debug(err)
+			if err != nil {
+				returnJson(w, http.StatusBadRequest, []byte(fmt.Sprintf(`{"error": "invalid int len %s"}`, lenParamStr)))
+				return
 			} else {
+				if lenParam > short.Conf.Maxlen {
+					returnJson(w, http.StatusBadRequest, []byte(fmt.Sprintf(`{"error": "len exceeds the limit %d > %d"}`, lenParam,  short.Conf.Maxlen)))
+					return
+				}
 				ln = lenParam
 			}
 		}
@@ -170,29 +182,21 @@ func UrlsShortUrlPut(w http.ResponseWriter, r *http.Request) {
 	url := model.Url{}
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Warn("malformed request body", err)
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(http.StatusBadRequest)
-		_, err = w.Write([]byte(`{"error": "malformed request body"}`))
-		if err != nil {
-			log.Warnf("response write failed %s", err.Error())
-		}
+		returnJson(w, http.StatusBadRequest, []byte(`{"error": "malformed request body"}`))
 		return
 	}
 	err = json.Unmarshal(b, &url)
 	if err != nil {
-		log.Warn("malformed json", err)
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(http.StatusBadRequest)
-		_, err = w.Write([]byte(`{"error": "malformed json body"}`))
-		if err != nil {
-			log.Warnf("response write failed %s", err.Error())
-		}
+		returnJson(w, http.StatusBadRequest, []byte(`{"error": "malformed json body"}`))
 		return
 	}
 	// todo validate struct
 	if url.ShortUrl == "" {
 		url.ShortUrl = sUrl // todo this is not needed and probably not a great idea
+		if !short.IsValidShort(url.ShortUrl) {
+			returnJson(w, http.StatusBadRequest, []byte(fmt.Sprintf(`{"error": "invalid short_url %s"}`, url.ShortUrl)))
+			return
+		}
 	}
 	err = storeUrl(bck, sUrl, url)
 	if err != nil {
