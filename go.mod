@@ -15,6 +15,7 @@ require (
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/lucasjones/reggen v0.0.0-20180717132126-cdb49ff09d77
 	github.com/sirupsen/logrus v1.4.2
+	github.com/spf13/viper v1.3.2
 	github.com/valyala/fasthttp v1.9.0
 	gopkg.in/yaml.v2 v2.2.8
 )

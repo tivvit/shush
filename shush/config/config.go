@@ -3,56 +3,103 @@ package config
 import (
 	"errors"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	"github.com/tivvit/shush/shush/config/backend"
 	"github.com/tivvit/shush/shush/config/cache"
-	"gopkg.in/yaml.v2"
-	"io/ioutil"
+	"github.com/tivvit/shush/shush/config/shortner"
 	"reflect"
+	"strings"
 )
 
 type Log struct {
-	Level string `yaml:"level,omitempty"`
+	Level string
 }
 
 type Server struct {
-	Address string `yaml:"address,omitempty"`
+	Address string
 }
 
 type Conf struct {
-	Log           Log          `yaml:"log,omitempty"`
-	Server        Server       `yaml:"server,omitempty"`
-	Api           Server       `yaml:"api,omitempty"`
-	Backend       backend.Conf `yaml:"backend,omitempty"`
-	Cache         *cache.Conf  `yaml:"cache,omitempty"`
-	GenUrlPattern string       `yaml:"gen-url-pattern,omitempty"`
+	Log       Log
+	Server    Server
+	Api       Server
+	Backend   backend.Conf
+	Cache     *cache.Conf
+	Shortener shortner.Conf
 }
 
 func NewConf(fn string) (*Conf, error) {
-	conf := &Conf{}
-	conf.defaults()
-	data, err := ioutil.ReadFile(fn)
+	if fn == "" {
+		viper.SetConfigName("config")      // name of config file (without extension)
+		viper.AddConfigPath("/etc/shush/") // path to look for the config file in
+		viper.AddConfigPath(".")           // optionally look for config in the working directory
+		if err := viper.ReadInConfig(); err != nil {
+			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+				log.Info("No config file loaded, using defaults")
+			} else {
+				log.Fatalf("Fatal error config file: %s \n", err)
+			}
+		} else {
+			log.Infof("Used config file %s", viper.ConfigFileUsed())
+		}
+	} else {
+		viper.SetConfigFile(fn)
+		err := viper.ReadInConfig()
+		if err != nil {
+			log.Fatalf("Fatal error config file: %s \n", err)
+		}
+		log.Infof("Used config file %s", viper.ConfigFileUsed())
+	}
+
+	viper.SetDefault("log.level", "Info")
+	viper.SetDefault("server.address", "127.0.0.1:8080")
+	viper.SetDefault("api.address", "127.0.0.1:8081")
+	viper.SetDefault("backend.badger", &backend.Badger{Path: "badger"})
+	viper.SetDefault("shortener.gen-url-pattern", "[a-zA-Z0-9]{5}")
+	viper.SetDefault("shortener.default-shortener", "generator")
+	viper.SetDefault("shortener.default-hash-algo", "fnv32")
+	viper.SetDefault("shortener.default-len", "5")
+	viper.SetDefault("shortener.gen-max-retries", "10")
+	viper.SetDefault("shortener.max-len", "50")
+	viper.SetDefault("shortener.valid-url-pattern", `^[a-zA-Z0-9\-\_]{1,50}$`)
+	viper.SetDefault("shortener.allowed-shorteners", map[string]bool{
+		"generator": true,
+		"hash":      true,
+	})
+	viper.SetDefault("shortener.allowed-hash-algo", map[string]bool{
+		"md5":       true,
+		"sha1":      true,
+		"sha256":    true,
+		"sha512":    true,
+		"fnv32":     true,
+		"fnv32a":    true,
+		"fnv64":     true,
+		"fnv64a":    true,
+		"fnv128":    true,
+		"fnv128a":   true,
+		"adler32":   true,
+		"crc32ieee": true,
+		"crc64iso":  true,
+		"crc64ecma": true,
+	})
+
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_", ".", "_"))
+	viper.SetEnvPrefix("shush")
+	viper.AutomaticEnv()
+
+	var conf Conf
+
+	err := viper.Unmarshal(&conf)
 	if err != nil {
-		log.Error(err)
+		log.Fatalf("unable to decode into struct, %v", err)
 	}
-	err = yaml.Unmarshal(data, &conf)
-	if err != nil {
-		log.Error(err)
-	}
-	if conf.numBackends() == 0 {
-		log.Info("No backend configured using in-mem")
-		conf.Backend.InMem = &backend.InMem{}
-	}
+
 	err = conf.validate()
 	if err != nil {
 		return nil, err
 	}
-	return conf, nil
-}
 
-func (c *Conf) defaults() {
-	c.Log.Level = "Info"
-	c.Server.Address = "127.0.0.1:8080"
-	c.GenUrlPattern = "[a-zA-Z0-9]{5}"
+	return &conf, nil
 }
 
 func (c *Conf) numBackends() int {

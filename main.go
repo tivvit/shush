@@ -21,7 +21,8 @@ import (
 var b *cache.ShushCache
 
 func main() {
-	confFile := flag.String("confFile", "conf.yml", "Configuration file path")
+	// todo use Cobra
+	confFile := flag.String("confFile", "", "Configuration file path")
 	flag.Parse()
 	cfg, err := config.NewConf(*confFile)
 	if err != nil {
@@ -49,7 +50,7 @@ func main() {
 	}()
 	wg.Add(1)
 	sb := backend.NewShushBackend(bck)
-	s, err := shortner.NewShortner(sb, cfg.GenUrlPattern)
+	s, err := shortner.NewShortner(sb, cfg.Shortener)
 	if err != nil {
 		log.Fatal(err)
 	}
