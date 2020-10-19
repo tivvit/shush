@@ -61,7 +61,34 @@ cache:
     max-cost: 10000000 # max number of elements (keys)
     metrics: false # optional, statistics for debugging
 ```
-todo shortener 
+```yaml
+shortener:
+  valid-url-pattern: ^[a-zA-Z0-9\-\_]{1,50}$ # optional
+  gen-url-pattern: [a-zA-Z0-9]{5} # optional
+  gen-max-retries: 10 # optional
+  default-shortener: generator # optional ["generator", "hash"]
+  default-hash-algo: fnv32 # optional ["md5", "sha1", "sha256","sha512", "fnv32", "fnv32a",  "fnv64", "fnv64a",  "fnv128",  "fnv128a",  "adler32",  "crc32ieee", "crc64iso",  "crc64ecma"]
+  default-len: 5 # optional, for hash and generator
+  max-len: 50 # optional, for requests
+  allowed-shorteners: # optional (only listed is supported), for requests
+    generator: true
+    hash: true
+  allowed-hash-algo: # optional (only listed is supported), for requests
+    md5: true
+    sha1: true
+    sha256: true
+    sha512: true
+    fnv32: true
+    fnv32a: true
+    fnv64: true
+    fnv64a: true
+    fnv128: true
+    fnv128a: true
+    adler32: true
+    crc32ieee: true
+    crc64iso: true
+    crc64ecma: true
+```
 
 ## Other
 number of possible generated urls in default settings (26+26+10)**5 = 916132832

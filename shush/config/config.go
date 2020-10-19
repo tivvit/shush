@@ -59,6 +59,7 @@ func NewConf(fn string) (*Conf, error) {
 	viper.SetDefault("shortener.default-shortener", "generator")
 	viper.SetDefault("shortener.default-hash-algo", "fnv32")
 	viper.SetDefault("shortener.default-len", "5")
+	viper.SetDefault("shortener.gen-max-retries", "10")
 	viper.SetDefault("shortener.max-len", "50")
 	viper.SetDefault("shortener.valid-url-pattern", `^[a-zA-Z0-9\-\_]{1,50}$`)
 	viper.SetDefault("shortener.allowed-shorteners", map[string]bool{

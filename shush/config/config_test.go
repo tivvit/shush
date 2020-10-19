@@ -31,6 +31,9 @@ func TestConf(t *testing.T) {
 	if c.Shortener.DefaultShortener != "generator" {
 		t.Error("Default shortener is not generator")
 	}
+	if c.Shortener.GenMaxRetries != 10 {
+		t.Error("Default max retries is not 10")
+	}
 	if c.Shortener.DefaultLen != 5 {
 		t.Error("Default len is not 5")
 	}
