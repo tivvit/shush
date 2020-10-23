@@ -44,7 +44,6 @@ func NewConf(fn string) (*Conf, error) {
 		}
 	} else {
 		viper.SetConfigFile(fn)
-		log.Info(fn)
 		err := viper.ReadInConfig()
 		if err != nil {
 			log.Fatalf("Fatal error config file: %s \n", err)
@@ -55,7 +54,6 @@ func NewConf(fn string) (*Conf, error) {
 	viper.SetDefault("log.level", "Info")
 	viper.SetDefault("server.address", "127.0.0.1:8080")
 	viper.SetDefault("api.address", "127.0.0.1:8081")
-	viper.SetDefault("backend.badger", &backend.Badger{Path: "badger"})
 	viper.SetDefault("shortener.gen-url-pattern", "[a-zA-Z0-9]{5}")
 	viper.SetDefault("shortener.default-shortener", "generator")
 	viper.SetDefault("shortener.default-hash-algo", "fnv32")
@@ -93,6 +91,10 @@ func NewConf(fn string) (*Conf, error) {
 	err := viper.Unmarshal(&conf)
 	if err != nil {
 		log.Fatalf("unable to decode into struct, %v", err)
+	}
+
+	if conf.numBackends() == 0 {
+		conf.Backend.Badger = &backend.Badger{Path: "badger"}
 	}
 
 	err = conf.validate()
