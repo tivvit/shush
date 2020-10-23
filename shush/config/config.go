@@ -44,6 +44,7 @@ func NewConf(fn string) (*Conf, error) {
 		}
 	} else {
 		viper.SetConfigFile(fn)
+		log.Info(fn)
 		err := viper.ReadInConfig()
 		if err != nil {
 			log.Fatalf("Fatal error config file: %s \n", err)
